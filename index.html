@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>PUAD</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Baloo+2:wght@600;700&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --hutan: #1f4d2b;
+            --daun: #3f8f4a;
+            --rumput: #8cc152;
+            --kertas: #fbfdf5;
+            --tanah: #7a5233;
+            --teks: #23402b;
+        }
+
+        html { scroll-behavior: smooth; scroll-padding-top: 90px; }
+        @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+
+        body {
+            margin: 0;
+            font-family: 'Nunito', Arial, sans-serif;
+            line-height: 1.7;
+            color: var(--teks);
+            background: linear-gradient(#bfe7f5 0%, #e3f5e6 55%, #cfe9a8 100%) fixed;
+        }
+
+        /* Matahari */
+        body::before {
+            content: "";
+            position: fixed;
+            top: 28px; right: 6vw;
+            width: 84px; height: 84px;
+            border-radius: 50%;
+            background: #ffe27a;
+            box-shadow: 0 0 0 14px rgba(255, 226, 122, .35), 0 0 60px 20px rgba(255, 226, 122, .5);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Padang rumput */
+        body::after {
+            content: "";
+            position: fixed;
+            left: 0; right: 0; bottom: 0;
+            height: 90px;
+            z-index: 0;
+            pointer-events: none;
+            background:
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='50' viewBox='0 0 60 50'%3E%3Cpath d='M0 50 L6 14 L12 50 Z M12 50 L22 4 L30 50 Z M28 50 L36 18 L44 50 Z M42 50 L52 8 L60 50 Z' fill='%233f8f4a'/%3E%3C/svg%3E") repeat-x 0 100% / 60px 50px,
+                url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='44' height='36' viewBox='0 0 44 36'%3E%3Cpath d='M0 36 L5 10 L10 36 Z M12 36 L20 2 L27 36 Z M28 36 L34 14 L40 36 Z' fill='%238cc152'/%3E%3C/svg%3E") repeat-x 22px 100% / 44px 36px,
+                linear-gradient(#2f7a3c, #1f5a2c) no-repeat 0 100% / 100% 24px;
+        }
+
+        /* Pohon kiri dan kanan */
+        .pohon {
+            position: fixed;
+            bottom: 34px;
+            width: 150px; height: 250px;
+            z-index: 0;
+            pointer-events: none;
+            background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 200'%3E%3Crect x='52' y='118' width='16' height='82' rx='4' fill='%237a5233'/%3E%3Ccircle cx='35' cy='105' r='32' fill='%232f7a3c'/%3E%3Ccircle cx='85' cy='105' r='32' fill='%232f7a3c'/%3E%3Ccircle cx='60' cy='78' r='46' fill='%233f8f4a'/%3E%3Ccircle cx='60' cy='46' r='30' fill='%2353a85a'/%3E%3C/svg%3E") no-repeat bottom / contain;
+        }
+        .pohon-kiri { left: 1vw; }
+        .pohon-kanan { right: 1vw; transform: scaleX(-1) scale(.85); transform-origin: bottom; }
+        @media (max-width: 1100px) { .pohon { display: none; } }
+
+        .wrap {
+            position: relative;
+            z-index: 1;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 16px 20px 150px;
+        }
+
+        /* Navigasi */
+        nav {
+            position: sticky;
+            top: 12px;
+            z-index: 10;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            padding: 8px 12px;
+            margin-bottom: 56px;
+            background: var(--hutan);
+            border-radius: 999px;
+            box-shadow: 0 6px 18px rgba(31, 77, 43, .3);
+        }
+        nav a {
+            color: #eaf6dc;
+            text-decoration: none;
+            font-weight: 700;
+            padding: 6px 14px;
+            border-radius: 999px;
+            transition: background .2s, color .2s;
+        }
+        nav a:hover, nav a:focus-visible { background: var(--rumput); color: var(--hutan); outline: none; }
+        @media (max-width: 560px) { nav { border-radius: 22px; } }
+
+        /* Section jadi kartu */
+        section {
+            background: var(--kertas);
+            border: 2px solid rgba(63, 143, 74, .25);
+            border-radius: 24px;
+            padding: 26px 28px;
+            margin-bottom: 56px;
+            box-shadow: 0 8px 22px rgba(31, 77, 43, .12);
+            position: relative;
+        }
+
+        /* Hewan mamalia darat di tepi atas tiap kartu */
+        .hewan {
+            position: absolute;
+            top: -44px;
+            right: 26px;
+            font-size: 54px;
+            line-height: 1;
+            user-select: none;
+            filter: drop-shadow(0 4px 3px rgba(31, 77, 43, .25));
+            transition: transform .25s;
+        }
+        .hewan:hover { transform: translateY(-6px) rotate(-6deg); }
+        @media (max-width: 560px) { .hewan { font-size: 40px; top: -34px; right: 16px; } }
+
+        h1, h2 { font-family: 'Baloo 2', 'Nunito', Arial, sans-serif; margin-top: 0; line-height: 1.2; }
+        h1 { color: var(--hutan); font-size: 2rem; }
+        h1::after {
+            content: "";
+            display: block;
+            width: 72px; height: 6px;
+            margin-top: 8px;
+            border-radius: 6px;
+            background: linear-gradient(90deg, var(--rumput), var(--daun));
+        }
+        h2 { color: var(--daun); font-size: 1.35rem; }
+
+        p a, li a { color: var(--daun); font-weight: 700; }
+        p a:hover, li a:hover { color: var(--hutan); }
+        li::marker { color: var(--daun); font-weight: 700; }
+
+        /* Gambar dan video */
+        img { border-radius: 16px; margin: 15px 0; display: block; max-width: 100%; height: auto; border: 4px solid #fff; box-shadow: 0 6px 16px rgba(31, 77, 43, .2); }
+        #beranda img { width: 180px; height: 180px; object-fit: cover; border-radius: 50%; border-color: var(--rumput); }
+        video { border-radius: 16px; margin: 15px 0; max-width: 100%; box-shadow: 0 6px 16px rgba(31, 77, 43, .2); }
+
+        /* Hiasan foto: harimau, daun, kupu-kupu */
+        .hias { position: absolute; pointer-events: none; }
+        .cincin { position: relative; width: 180px; height: 180px; margin: 44px 0 64px 78px; }
+        #beranda .cincin img { margin: 0; }
+        .cincin .harimau { left: -76px; bottom: -48px; width: 132px; z-index: 3; filter: drop-shadow(0 4px 4px rgba(31, 77, 43, .3)); }
+        .cincin .daun-bawah { left: -54px; bottom: -36px; width: 120px; z-index: 2; }
+        .cincin .daun-atas { right: -58px; top: -44px; width: 110px; transform: rotate(180deg); z-index: 2; }
+        .cincin .k1 { right: -48px; top: 58px; width: 30px; transform: rotate(12deg); z-index: 3; }
+        .cincin .k2 { left: -18px; top: 12px; width: 24px; transform: rotate(-18deg); z-index: 3; }
+        .kotak { position: relative; display: inline-block; max-width: 100%; box-sizing: border-box; padding: 22px; margin: 15px 0; }
+        #galeri .kotak img { margin: 0; }
+        .kotak .daun-kiri { left: -6px; bottom: -8px; width: 100px; }
+        .kotak .daun-kanan { right: -6px; top: -8px; width: 100px; transform: rotate(180deg); }
+        .kotak .k3 { left: 2px; top: -6px; width: 30px; transform: rotate(-12deg); }
+        .kotak .k4 { right: 6px; bottom: 0; width: 26px; transform: rotate(-14deg); }
+
+        /* Tabel */
+        .tabel-scroll { overflow-x: auto; border-radius: 14px; }
+        table { border-collapse: collapse; width: 100%; margin: 15px 0; background: #fff; }
+        th, td { border: 1px solid #cfe3c2; padding: 10px 12px; text-align: left; }
+        th { background: var(--daun); color: #fff; font-family: 'Baloo 2', 'Nunito', Arial, sans-serif; }
+        tr:nth-child(even) td { background: #f1f8e6; }
+        tr:hover td { background: #e2f1c9; }
+
+        /* ===== Gerak: awan, burung, hewan berjalan, dan lainnya ===== */
+        .awan { position: fixed; left: 0; z-index: 0; pointer-events: none; width: 120px; height: 36px; background: #fff; border-radius: 40px; opacity: .85; animation: awan-lewat 90s linear infinite; }
+        .awan::before, .awan::after { content: ""; position: absolute; background: #fff; border-radius: 50%; }
+        .awan::before { width: 52px; height: 52px; top: -26px; left: 18px; }
+        .awan::after { width: 38px; height: 38px; top: -18px; left: 62px; }
+        .aw1 { top: 11%; animation-delay: -20s; }
+        .aw2 { top: 26%; scale: .7; opacity: .7; animation-duration: 130s; animation-delay: -70s; }
+        @keyframes awan-lewat { from { transform: translateX(-160px); } to { transform: translateX(calc(100vw + 160px)); } }
+
+        .burung { position: fixed; left: 0; z-index: 5; pointer-events: none; animation: terbang 30s linear infinite; }
+        .burung svg { display: block; width: 100%; transform-origin: center; animation: kepak .5s ease-in-out infinite alternate, naik-turun 3s ease-in-out infinite alternate; }
+        .bu1 { top: 16%; width: 44px; animation-delay: -6s; }
+        .bu2 { top: 27%; width: 32px; animation-duration: 40s; animation-delay: -22s; }
+        .bu3 { top: 9%; width: 26px; animation-duration: 52s; animation-delay: -38s; }
+        @keyframes terbang { from { transform: translateX(-90px); } to { transform: translateX(calc(100vw + 90px)); } }
+        @keyframes kepak { from { transform: scaleY(1); } to { transform: scaleY(.35); } }
+        @keyframes naik-turun { from { translate: 0 -8px; } to { translate: 0 10px; } }
+
+        .jalan { position: fixed; left: 0; bottom: 20px; z-index: 2; pointer-events: none; line-height: 1; animation: jalan-kiri 60s linear infinite; }
+        .jalan span { display: block; animation: langkah .7s ease-in-out infinite; }
+        .j1 { font-size: 44px; animation-duration: 90s; animation-delay: -15s; }
+        .j2 { font-size: 36px; animation-duration: 58s; animation-delay: -40s; }
+        .j3 { font-size: 24px; animation-duration: 36s; animation-delay: -8s; }
+        .j3 span { animation: lompat .8s ease-out infinite; }
+        @keyframes jalan-kiri { from { transform: translateX(105vw); } to { transform: translateX(-90px); } }
+        @keyframes langkah { 0%, 100% { translate: 0 0; rotate: 0deg; } 50% { translate: 0 -3px; rotate: -2deg; } }
+        @keyframes lompat { 0%, 100% { translate: 0 0; } 50% { translate: 0 -16px; } }
+
+        .hewan { transform-origin: 50% 90%; animation: goyang 3.4s ease-in-out infinite; }
+        section:nth-of-type(2) .hewan { animation-delay: -.6s; }
+        section:nth-of-type(3) .hewan { animation-delay: -1.2s; }
+        section:nth-of-type(4) .hewan { animation-delay: -1.8s; }
+        section:nth-of-type(5) .hewan { animation-delay: -2.4s; }
+        section:nth-of-type(6) .hewan { animation-delay: -3s; }
+        @keyframes goyang { 0%, 100% { translate: 0 0; rotate: -3deg; } 50% { translate: 0 -5px; rotate: 3deg; } }
+
+        .pohon { transform-origin: bottom center; animation: pohon-goyang 6s ease-in-out infinite alternate; }
+        .pohon-kanan { animation-delay: -3s; }
+        @keyframes pohon-goyang { from { rotate: -1.2deg; } to { rotate: 1.2deg; } }
+
+        .harimau { transform-origin: 50% 100%; animation: napas 3.2s ease-in-out infinite; }
+        .harimau .ekor { transform-origin: 120px 152px; animation: kibas 1.3s ease-in-out infinite alternate; }
+        .harimau .mata { transform-origin: 80px 64px; animation: kedip 4.5s infinite; }
+        @keyframes napas { 0%, 100% { transform: scaleY(1); } 50% { transform: scaleY(1.025); } }
+        @keyframes kibas { from { transform: rotate(-9deg); } to { transform: rotate(11deg); } }
+        @keyframes kedip { 0%, 90%, 100% { transform: scaleY(1); } 94% { transform: scaleY(.1); } }
+
+        .k1, .k2, .k3, .k4 { animation: kepak-kupu .3s ease-in-out infinite alternate, melayang 5s ease-in-out infinite alternate; }
+        .k2 { animation-duration: .35s, 6.5s; }
+        .k3 { animation-duration: .32s, 5.5s; }
+        .k4 { animation-duration: .38s, 7s; }
+        @keyframes kepak-kupu { from { scale: 1 1; } to { scale: .55 1; } }
+        @keyframes melayang { from { translate: -6px 4px; } to { translate: 10px -12px; } }
+
+        /* Hormati pengaturan "kurangi gerakan" di perangkat */
+        @media (prefers-reduced-motion: reduce) {
+            .awan, .burung, .jalan { display: none; }
+            .hewan, .pohon, .harimau, .harimau .ekor, .harimau .mata, .k1, .k2, .k3, .k4 { animation: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+        <defs>
+            <symbol id="gugus-daun" viewBox="0 0 120 100">
+                <g transform="translate(14 90)">
+                    <path d="M0 0 C14 -12 38 -12 60 0 C38 12 14 12 0 0 Z" fill="#2f7a3c" transform="rotate(-95)"/>
+                    <path d="M0 0 C14 -12 38 -12 60 0 C38 12 14 12 0 0 Z" fill="#3f8f4a" transform="rotate(-65)"/>
+                    <path d="M0 0 C14 -12 38 -12 60 0 C38 12 14 12 0 0 Z" fill="#53a85a" transform="rotate(-35)"/>
+                    <path d="M0 0 C14 -12 38 -12 60 0 C38 12 14 12 0 0 Z" fill="#2f7a3c" transform="rotate(-8)"/>
+                </g>
+            </symbol>
+            <symbol id="kupu" viewBox="0 0 40 30">
+                <ellipse cx="12" cy="11" rx="11" ry="9" fill="#f6a48c" transform="rotate(-20 12 11)"/>
+                <ellipse cx="13" cy="21" rx="7" ry="6" fill="#f9c5a8"/>
+                <ellipse cx="28" cy="11" rx="11" ry="9" fill="#f6a48c" transform="rotate(20 28 11)"/>
+                <ellipse cx="27" cy="21" rx="7" ry="6" fill="#f9c5a8"/>
+                <ellipse cx="20" cy="15" rx="1.8" ry="9" fill="#5a3b2a"/>
+            </symbol>
+        </defs>
+    </svg>
+
+
+    <div class="pohon pohon-kiri"></div>
+    <div class="pohon pohon-kanan"></div>
+
+    <div class="awan aw1" aria-hidden="true"></div>
+    <div class="awan aw2" aria-hidden="true"></div>
+
+    <div class="burung bu1" aria-hidden="true"><svg viewBox="0 0 44 20"><path d="M2 14 Q12 0 22 12 Q32 0 42 14" fill="none" stroke="#2b3a2f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="burung bu2" aria-hidden="true"><svg viewBox="0 0 44 20"><path d="M2 14 Q12 0 22 12 Q32 0 42 14" fill="none" stroke="#2b3a2f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+    <div class="burung bu3" aria-hidden="true"><svg viewBox="0 0 44 20"><path d="M2 14 Q12 0 22 12 Q32 0 42 14" fill="none" stroke="#2b3a2f" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+
+    <div class="jalan j1" aria-hidden="true"><span>🐘</span></div>
+    <div class="jalan j2" aria-hidden="true"><span>🦌</span></div>
+    <div class="jalan j3" aria-hidden="true"><span>🐇</span></div>
+
+    <div class="wrap">
+
+    <nav>
+        <a href="#beranda">Beranda</a>
+        <a href="#tentang">Tentang Saya</a>
+        <a href="#fokus">Fokus Utama</a>
+        <a href="#galeri">Galeri</a>
+        <a href="#tabel">Tabel</a>
+        <a href="#kontak">Kontak</a>
+    </nav>
+
+    <!-- Beranda -->
+    <section id="beranda">
+        <span class="hewan" role="img" aria-label="Rusa">🦌</span>
+        <h1>Profil Diri - PUAD</h1>
+
+        <div class="cincin">
+            <img src="foto100.jpg" alt="PUAD" width="180">
+            <svg class="hias daun-bawah" viewBox="0 0 120 100" aria-hidden="true"><use href="#gugus-daun"/></svg>
+            <svg class="hias harimau" viewBox="0 0 160 190" role="img" aria-label="Harimau">
+                <g stroke="#3a2616" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round">
+                    <g class="ekor">
+                    <path d="M120 152 Q158 150 148 108" fill="none" stroke-width="15"/>
+                    <path d="M120 152 Q158 150 148 108" fill="none" stroke="#f5a23a" stroke-width="10"/>
+                    <path d="M120 152 Q158 150 148 108" fill="none" stroke-width="10" stroke-dasharray="4 10" stroke-linecap="butt"/>
+                    </g>
+                    <ellipse cx="80" cy="140" rx="46" ry="46" fill="#f5a23a"/>
+                    <ellipse cx="80" cy="150" rx="24" ry="32" fill="#fff4e0" stroke="none"/>
+                    <path d="M36 124 q11 3 15 13 M35 146 q11 1 16 10 M124 124 q-11 3 -15 13 M125 146 q-11 1 -16 10" fill="none" stroke-width="5"/>
+                    <ellipse cx="58" cy="180" rx="17" ry="10" fill="#fff4e0"/>
+                    <ellipse cx="102" cy="180" rx="17" ry="10" fill="#fff4e0"/>
+                    <path d="M52 176 v8 M60 177 v8 M96 177 v8 M104 176 v8" fill="none" stroke-width="1.8"/>
+                    <circle cx="42" cy="36" r="15" fill="#f5a23a"/>
+                    <circle cx="118" cy="36" r="15" fill="#f5a23a"/>
+                    <circle cx="42" cy="37" r="7" fill="#f4a0a0" stroke="none"/>
+                    <circle cx="118" cy="37" r="7" fill="#f4a0a0" stroke="none"/>
+                    <ellipse cx="80" cy="70" rx="46" ry="40" fill="#f5a23a"/>
+                    <path d="M80 32 v13 M66 34 l3 11 M94 34 l-3 11" fill="none" stroke-width="4"/>
+                    <path d="M35 62 l12 4 M35 75 l12 -2 M125 62 l-12 4 M125 75 l-12 -2" fill="none" stroke-width="3.5"/>
+                    <ellipse cx="80" cy="84" rx="24" ry="17" fill="#fff4e0" stroke="none"/>
+                    <circle cx="50" cy="82" r="5" fill="#f9b9b0" opacity=".7" stroke="none"/>
+                    <circle cx="110" cy="82" r="5" fill="#f9b9b0" opacity=".7" stroke="none"/>
+                    <g class="mata">
+                    <circle cx="62" cy="64" r="6" fill="#2b1a0e" stroke="none"/>
+                    <circle cx="98" cy="64" r="6" fill="#2b1a0e" stroke="none"/>
+                    <circle cx="64" cy="62" r="2" fill="#fff" stroke="none"/>
+                    <circle cx="100" cy="62" r="2" fill="#fff" stroke="none"/>
+                    </g>
+                    <path d="M73 77 h14 l-7 8 z" fill="#e86a7a" stroke-width="2"/>
+                    <path d="M80 85 v5 M80 90 q-7 6 -13 1 M80 90 q7 6 13 1" fill="none" stroke-width="2"/>
+                </g>
+            </svg>
+            <svg class="hias daun-atas" viewBox="0 0 120 100" aria-hidden="true"><use href="#gugus-daun"/></svg>
+            <svg class="hias k1" viewBox="0 0 40 30" aria-hidden="true"><use href="#kupu"/></svg>
+            <svg class="hias k2" viewBox="0 0 40 30" aria-hidden="true"><use href="#kupu"/></svg>
+        </div>
+
+        <p>
+            Halo! Nama saya <b>PUAD</b>, seorang mahasiswa <i>Program Studi Sistem Informasi</i>
+            yang berfokus pada <a href="#tentang">pengembangan perangkat lunak</a>,
+            <i>administrasi jaringan</i>, serta pengelolaan basis data. Saat ini saya aktif belajar
+            membuat berbagai proyek aplikasi berbasis web dan mengeksplorasi teknologi <i>otomatisasi</i>
+            untuk meningkatkan efisiensi kerja.
+        </p>
+
+        <p>
+            Selain bidang teknologi informasi, saya juga memiliki ketertarikan di dunia <b>Esports</b>
+            dan <span style="color: green;">Mempelajari Bahasa asing</span>. Di waktu luang, saya suka
+            bermain game <b>Mobile Legend</b> dan game mobile lainnya untuk bersantai, selain juga
+            melatih keterampilan teknis dan mempelajari perkembangan teknologi
+            <i>kecerdasan buatan (AI)</i> yang dapat diintegrasikan dalam kehidupan sehari-hari.
+        </p>
+    </section>
+
+    <!-- Tentang Saya -->
+    <section id="tentang">
+        <span class="hewan" role="img" aria-label="Gajah">🐘</span>
+        <h1>Tentang Saya</h1>
+
+        <p>
+            Nama saya <b>PUAD</b>. Saya adalah mahasiswa Program Studi Sistem Informasi
+            yang tertarik pada pengembangan perangkat lunak, administrasi jaringan, dan
+            pengelolaan basis data.
+        </p>
+
+        <p>
+            Halaman ini berisi informasi singkat tentang latar belakang dan minat saya
+            dalam bidang teknologi informasi, termasuk hobi bermain game Mobile Legend
+            di waktu luang.
+        </p>
+    </section>
+
+    <!-- Fokus Utama -->
+    <section id="fokus">
+        <span class="hewan" role="img" aria-label="Jerapah">🦒</span>
+        <h2>Fokus Prioritas Pengembangan Saat Ini:</h2>
+        <ol>
+            <li><b>Perancangan Web & Antarmuka:</b> Membangun struktur HTML, tata letak CSS responsif, dan skrip JavaScript interaktif.</li>
+            <li><b>Integrasi API & Backend:</b> Pengelolaan basis data relasional serta komunikasi layanan web.</li>
+            <li><b>Otomatisasi Sistem:</b> Eksplorasi skrip bantu browser dan efisiensi produktivitas tugas.</li>
+        </ol>
+    </section>
+
+    <!-- Galeri -->
+    <section id="galeri">
+        <span class="hewan" role="img" aria-label="Harimau">🐅</span>
+        <h1>Galeri</h1>
+
+        <h2>Quotes of the day</h2>
+        <div class="kotak">
+            <img src="foto101.png" alt="Quotes of the day" width="350">
+            <svg class="hias daun-kiri" viewBox="0 0 120 100" aria-hidden="true"><use href="#gugus-daun"/></svg>
+            <svg class="hias daun-kanan" viewBox="0 0 120 100" aria-hidden="true"><use href="#gugus-daun"/></svg>
+            <svg class="hias k3" viewBox="0 0 40 30" aria-hidden="true"><use href="#kupu"/></svg>
+            <svg class="hias k4" viewBox="0 0 40 30" aria-hidden="true"><use href="#kupu"/></svg>
+        </div>
+
+        <h2>Rells ig</h2>
+        <video width="400" controls>
+            <source src="video011.mp4" type="video/mp4">
+            Browser kamu tidak mendukung tag video.
+        </video>
+    </section>
+
+    <!-- Tabel -->
+    <section id="tabel">
+        <span class="hewan" role="img" aria-label="Badak">🦏</span>
+        <h1>Riwayat Progress Belajar Web</h1>
+
+        <div class="tabel-scroll">
+        <table>
+            <tr>
+                <th>No</th>
+                <th>Pertemuan</th>
+                <th>Materi</th>
+                <th>Status</th>
+                <th>Keterangan</th>
+            </tr>
+            <tr>
+                <td>1</td>
+                <td>Pertemuan 1</td>
+                <td>Pengenalan HTML</td>
+                <td>Selesai</td>
+                <td>Struktur dasar, tag h1 & p</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>Pertemuan 2</td>
+                <td>Elisitasi Kebutuhan</td>
+                <td>Selesai</td>
+                <td>Teori pengumpulan kebutuhan sistem</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Pertemuan 3</td>
+                <td>Formatting Teks HTML</td>
+                <td>Selesai</td>
+                <td>Bold, italic, span, warna teks</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Pertemuan 4</td>
+                <td>Hyperlink & Navigasi Halaman</td>
+                <td>Selesai</td>
+                <td>Anchor link antar section</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Pertemuan 5</td>
+                <td>Gambar & Video</td>
+                <td>Selesai</td>
+                <td>Tag img dan video di Galeri</td>
+            </tr>
+            <tr>
+                <td>6</td>
+                <td>Pertemuan 6</td>
+                <td>Tabel HTML</td>
+                <td>Selesai</td>
+                <td>Tag table, tr, th, td</td>
+            </tr>
+        </table>
+        </div>
+    </section>
+
+    <!-- Kontak -->
+    <section id="kontak">
+        <span class="hewan" role="img" aria-label="Tupai">🐿️</span>
+        <h1>Kontak</h1>
+        <p>Silakan gunakan informasi berikut untuk menghubungi saya:</p>
+        <ul>
+            <li>Email: <a href="mailto:puadp0803@gmail.com">puadp0803@gmail.com</a></li>
+            <li>Telepon: <a href="tel:+6283896535650">+62 838-9653-5650</a></li>
+        </ul>
+    </section>
+
+    </div>
+
+</body>
+</html>
